@@ -6,7 +6,7 @@
 | | |
 |---|---|
 | **Integrantes** | MONICA ALEJANDRA PARRA QUINTERO |
-| **Informe final** |  |
+| **Informe final** | [Abrir PDF](docs/Informe%20Final%20Grupo12%20PrediccionCafetera.pdf) |
 | **Repositorio** | https://github.com/monialeja1011/Prediccion-Cafetera---Monica-Alejandra-Parra.git |
 | **Sustentación** | Lunes 23 de noviembre de 2026 |
  
@@ -295,7 +295,7 @@ prediccion-cafetera/
 │   ├── modelo_comparacion.png                 evaluación de modelos
 │   └── modelo_real_vs_predicho.png
 ├── docs/
-
+│    └── Informe Final Grupo12 PrediccionCafetera.pdf
 └── src/
     ├── limpiar_datos.py          preparación de datos (Pandas)
     ├── graficos_seaborn.py       gráficos de análisis (Seaborn)
