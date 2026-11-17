@@ -319,7 +319,7 @@ prediccion-cafetera/
 **1. Clonar el repositorio**
  
 ```bash
-git clone [COMPLETAR: URL del repositorio]
+git clone https://github.com/monialeja1011/Prediccion-Cafetera---Monica-Alejandra-Parra.git
 cd prediccion-cafetera
 ```
  
