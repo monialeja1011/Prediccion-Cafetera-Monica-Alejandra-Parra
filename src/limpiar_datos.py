@@ -4,13 +4,12 @@ import pandas as pd
 
 RAIZ = Path(__file__).resolve().parents[1]  # funciona desde cualquier carpeta
 
-# Archivo original
+
 archivo_entrada = RAIZ / "data" / "eva_base_agricola.csv"
 
-# Archivo limpio
 archivo_salida = RAIZ / "data" / "cafe_valle_limpio.csv"
 
-# Leer datos
+
 df = pd.read_csv(archivo_entrada)
 
 print("Dimensiones:", df.shape)
@@ -22,7 +21,7 @@ print(df.isna().sum())
 
 print("\nFilas duplicadas:", df.duplicated().sum())
 
-# Filtrar únicamente Café del Valle del Cauca
+
 cafe = df[
     (df["departamento"].str.upper() == "VALLE DEL CAUCA")
     & (df["cultivo"].str.upper() == "CAFÉ")
@@ -70,7 +69,6 @@ for columna in columnas_medidas:
     print(f"{columna}: {len(atipicos)}")
 
 
-# Seleccionar las variables principales
 cafe = cafe[
     [
         "c_digo_dane_municipio",
@@ -83,7 +81,7 @@ cafe = cafe[
     ]
 ]
 
-# Renombrar las columnas para que sean fáciles de utilizar
+
 cafe = cafe.rename(
     columns={
         "c_digo_dane_municipio": "codigo_municipio",
@@ -96,7 +94,6 @@ cafe = cafe.rename(
     }
 )
 
-# Convertir variables numéricas
 columnas_numericas = [
     "codigo_municipio",
     "año",
@@ -109,7 +106,7 @@ columnas_numericas = [
 for columna in columnas_numericas:
     cafe[columna] = pd.to_numeric(cafe[columna], errors="coerce")
 
-# Revisar y tratar registros incompletos o medidas imposibles
+
 filas_antes = len(cafe)
 nulos_antes = int(cafe.isna().sum().sum())
 duplicados_antes = int(cafe.duplicated().sum())
@@ -137,12 +134,12 @@ print("Duplicados antes del tratamiento:", duplicados_antes)
 print("Filas después del tratamiento:", len(cafe))
 print("Nulos después del tratamiento:", int(cafe.isna().sum().sum()))
 
-# Ordenar los datos
+
 cafe = cafe.sort_values(
     ["municipio", "año"]
 ).reset_index(drop=True)
 
-# Guardar
+
 cafe.to_csv(archivo_salida, index=False, encoding="utf-8")
 resumen = pd.DataFrame([
     {

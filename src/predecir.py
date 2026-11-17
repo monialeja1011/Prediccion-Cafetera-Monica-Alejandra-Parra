@@ -2,19 +2,19 @@ import pandas as pd
 import joblib
 
 
-# Cargar el modelo entrenado
+
 archivo_modelo = "data/modelo_cafetero.pkl"
 
 modelo = joblib.load(archivo_modelo)
 
 
-# Datos del escenario que queremos predecir
+
 año = 2026
 hectareas_sembradas = 280
 hectareas_cosechadas = 240
 
 
-# Crear los datos de entrada
+
 datos = pd.DataFrame(
     {
         "año": [año],
@@ -24,11 +24,11 @@ datos = pd.DataFrame(
 )
 
 
-# Realizar la predicción
+
 prediccion = modelo.predict(datos)
 
 
-# Mostrar resultado
+
 print("=" * 60)
 print("PREDICCIÓN DE PRODUCCIÓN DE CAFÉ")
 print("=" * 60)

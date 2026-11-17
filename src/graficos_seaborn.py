@@ -10,7 +10,7 @@ df = pd.read_csv(archivo)
 
 sns.set_theme(style="whitegrid")
 
-# Gráfica 1: distribución de la producción
+
 plt.figure(figsize=(9, 5))
 sns.histplot(data=df, x="produccion", bins=25, kde=True)
 
@@ -24,7 +24,7 @@ plt.savefig(salida, dpi=300)
 plt.close()
 print(f"Gráfica guardada en: {salida}")
 
-# Gráfica 2: relación entre área cosechada y producción
+
 plt.figure(figsize=(9, 5))
 sns.scatterplot(
     data=df,
@@ -43,7 +43,7 @@ plt.savefig(salida, dpi=300)
 plt.close()
 print(f"Gráfica guardada en: {salida}")
 
-# Gráfica 3: distribución de la producción por año
+
 plt.figure(figsize=(9, 5))
 sns.boxplot(
     data=df,

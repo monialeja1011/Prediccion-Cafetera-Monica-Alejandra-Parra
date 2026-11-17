@@ -3,16 +3,16 @@ import matplotlib.pyplot as plt
 
 archivo = "data/cafe_valle_limpio.csv"
 
-# Leer datos
+
 df = pd.read_csv(archivo)
 
-# Filtrar únicamente Cartago
+
 cartago = df[df["codigo_municipio"] == 76147].copy()
 
-# Ordenar por año
+
 cartago = cartago.sort_values("año")
 
-# Crear gráfica
+
 plt.figure(figsize=(10, 6))
 
 plt.plot(
@@ -27,7 +27,7 @@ plt.xlabel("Año")
 plt.ylabel("Producción")
 plt.grid(True, alpha=0.3)
 
-# Mostrar el valor sobre cada punto
+
 for _, fila in cartago.iterrows():
     plt.annotate(
         f"{fila['produccion']:.2f}",
@@ -39,7 +39,6 @@ for _, fila in cartago.iterrows():
 
 plt.tight_layout()
 
-# Guardar gráfica
 salida = "data/produccion_cartago.png"
 plt.savefig(salida, dpi=300)
 
