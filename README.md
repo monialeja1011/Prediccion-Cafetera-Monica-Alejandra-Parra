@@ -309,80 +309,246 @@ prediccion-cafetera/
 ---
  
 ## 9. Cómo ejecutar el proyecto
- 
-### Requisitos
- 
-- [Docker](https://docs.docker.com/get-docker/) con Docker Compose.
-- Git.
-### Opción recomendada: Docker
- 
-**1. Clonar el repositorio**
- 
-```bash
-git clone https://github.com/monialeja1011/Prediccion-Cafetera---Monica-Alejandra-Parra.git
-cd prediccion-cafetera
+
+Esta guía te lleva paso a paso, desde un computador sin nada instalado hasta ver funcionar el proyecto. La ruta principal es **Windows 10/11 con PowerShell**. Al final hay notas para macOS y Linux.
+
+> **Cómo leer los bloques de comandos.**
+> - Los bloques marcados **PowerShell** se escriben en la terminal de tu computador.
+> - Los bloques marcados **Dentro del contenedor** se escriben solo después de entrar al contenedor (paso 6). Allí PowerShell ya no es la terminal activa.
+> - Escribe cada comando y pulsa **Enter**. No copies los símbolos `#`: lo que sigue a ese símbolo es solo un comentario.
+
+### 9.1 Qué debes instalar antes de empezar
+
+| Programa | Para qué sirve | Dónde descargarlo |
+|---|---|---|
+| **Git** | Descargar (clonar) el proyecto desde GitHub | https://git-scm.com/download/win |
+| **Docker Desktop** | Ejecutar el proyecto en un entorno ya configurado, sin instalar Python ni librerías a mano | https://docs.docker.com/get-docker/ |
+
+1. Instala Git con las opciones que el instalador propone por defecto.
+2. Instala Docker Desktop. Si el instalador pide reiniciar el computador, hazlo.
+3. **Abre Docker Desktop** desde el menú Inicio y espera a que indique que está en ejecución (el motor de Docker debe aparecer como iniciado). **Docker Desktop debe estar abierto cada vez que uses el proyecto.**
+4. Abre PowerShell: pulsa la tecla Windows, escribe `PowerShell` y pulsa Enter.
+
+### 9.2 Comprobar que todo está instalado
+
+**PowerShell:**
+
+```powershell
+git --version
+docker --version
+docker compose version
 ```
- 
-**2. Construir e iniciar el contenedor**
- 
-```bash
+
+Cada comando debe mostrar un número de versión. Si alguno dice que no se reconoce, cierra PowerShell, ábrela de nuevo y repite. Si sigue fallando, consulta la tabla de problemas (9.11).
+
+Comprueba también que Docker Desktop está funcionando:
+
+```powershell
+docker info
+```
+
+Si aparece información del sistema, todo está bien. Si aparece un error de conexión, abre Docker Desktop y espera a que termine de iniciar.
+
+### 9.3 Clonar el repositorio
+
+"Clonar" significa descargar una copia del proyecto en tu computador. Elige una carpeta donde trabajar (por ejemplo, Documentos) y entra en ella:
+
+**PowerShell:**
+
+```powershell
+cd $HOME\Documents
+git clone https://github.com/monialeja1011/Prediccion-Cafetera---Monica-Alejandra-Parra.git
+cd Prediccion-Cafetera---Monica-Alejandra-Parra
+```
+
+> `git clone` crea una carpeta con el nombre del repositorio: **`Prediccion-Cafetera---Monica-Alejandra-Parra`** (con tres guiones). No se llama `prediccion-cafetera`. Si la carpeta no se llama así, escribe `Get-ChildItem` para ver el nombre exacto y usa ese en el `cd`.
+
+### 9.4 Comprobar que estás en la carpeta correcta
+
+Todos los comandos de Docker deben ejecutarse en la **carpeta raíz** del proyecto, la que contiene `docker-compose.yml`. Compruébalo:
+
+**PowerShell:**
+
+```powershell
+Get-ChildItem
+```
+
+Debes ver, entre otros, estos elementos: `Dockerfile`, `docker-compose.yml`, `requirements.txt`, `README.md`, y las carpetas `data` y `src`. Si no los ves, estás en otra carpeta: vuelve al paso 9.3 y repite el `cd`.
+
+### 9.5 Construir e iniciar el contenedor
+
+Un contenedor es un "mini computador" dentro del tuyo, con Python y las librerías del proyecto ya instaladas.
+
+**PowerShell** (desde la carpeta raíz, con Docker Desktop abierto):
+
+```powershell
 docker compose up -d --build
 ```
- 
-**3. Entrar al contenedor**
- 
-```bash
+
+La primera vez puede tardar varios minutos, porque descarga e instala todo. Cuando termine, comprueba que el contenedor está activo:
+
+**PowerShell:**
+
+```powershell
+docker compose ps
+```
+
+El servicio `prediccion-cafetera` debe aparecer con estado `running` (en ejecución).
+
+<!-- VERIFICAR contra docker-compose.yml: nombre del servicio (prediccion-cafetera). -->
+
+### 9.6 Entrar al contenedor
+
+**PowerShell:**
+
+```powershell
 docker compose exec prediccion-cafetera bash
 ```
- 
-La terminal abre en `/app/src`. El proyecto está montado como volumen, así que los archivos generados quedan también en tu equipo.
- 
-**4. Ejecutar el flujo completo, en este orden**
- 
+
+El texto de la terminal cambia: ahora estás **dentro del contenedor** y tu sesión abre en la carpeta `/app/src`. Puedes confirmarlo con:
+
+**Dentro del contenedor:**
+
 ```bash
-python limpiar_datos.py         # genera data/cafe_valle_limpio.csv
-python graficos_seaborn.py      # gráficos de análisis
-python perceptron_proyecto.py   # perceptrón, pesos y 3 gráficos
-python modelo_proyecto.py       # compara modelos y guarda modelo_final.joblib
-python usar_modelo.py           # demostración (no reentrena)
+pwd
 ```
- 
-**5. Apagar el contenedor**
- 
+
+Debe mostrar `/app/src`. Para **salir** del contenedor, escribe `exit` y pulsa Enter; volverás a PowerShell.
+
+<!-- VERIFICAR contra Dockerfile/docker-compose.yml: working_dir = /app/src y que bash exista en la imagen. -->
+
+### 9.7 Ejecutar el flujo completo
+
+Estando **dentro del contenedor**, ejecuta los scripts **en este orden**, porque cada uno usa lo que produce el anterior:
+
+**Dentro del contenedor:**
+
 ```bash
-exit
-docker compose down
+python limpiar_datos.py
+python graficos_seaborn.py
+python perceptron_proyecto.py
+python modelo_proyecto.py
+python usar_modelo.py
 ```
- 
-> El repositorio ya incluye `modelo_final.joblib` y `perceptron_pesos.npz`, por lo que `usar_modelo.py` funciona directamente, sin ejecutar los pasos anteriores.
- 
-### Verificación rápida
- 
-Si todo funciona, deberías ver estos valores:
- 
+
+| Script | Qué hace | Qué produce |
+|---|---|---|
+| `limpiar_datos.py` | Filtra el café del Valle del Cauca y revisa la calidad de los datos | `data/cafe_valle_limpio.csv` y `data/resumen_antes_despues.csv` |
+| `graficos_seaborn.py` | Dibuja los gráficos del análisis exploratorio | Tres imágenes `data/grafico_*.png` |
+| `perceptron_proyecto.py` | Entrena el perceptrón hecho desde cero y mide su exactitud | `src/perceptron_pesos.npz` y tres imágenes `data/perceptron_*.png` |
+| `modelo_proyecto.py` | Compara los tres modelos de Scikit-Learn y guarda el mejor | `src/modelo_final.joblib` y dos imágenes `data/modelo_*.png` |
+| `usar_modelo.py` | Usa los modelos ya guardados para estimar casos nuevos (no reentrena) | Texto en pantalla, sin archivos nuevos |
+
+**Verificación rápida.** Si todo funciona, deberías ver estos valores:
+
 | Script | Valor esperado |
 |---|---|
 | `limpiar_datos.py` | 273 registros, 39 municipios, años 2019–2025 |
 | `perceptron_proyecto.py` | w₁ = 0,0573 · w₂ = 8,7544 · exactitud en prueba 0,9273 |
 | `modelo_proyecto.py` | Mejor modelo: Random Forest · R² en prueba 0,8689 |
 | `usar_modelo.py` | 327,4 toneladas para el escenario de Cartago |
- 
-### Alternativa: sin Docker (entorno virtual)
- 
+
+### 9.8 Solo la demostración (sin reentrenar)
+
+El repositorio ya incluye `modelo_final.joblib` y `perceptron_pesos.npz`, así que puedes probar el modelo sin ejecutar los pasos anteriores. Entra al contenedor (9.6) y ejecuta:
+
+**Dentro del contenedor:**
+
+```bash
+python usar_modelo.py
+```
+
+Para probar un **caso propio**, escribe tres números separados por espacios: **año, hectáreas sembradas y hectáreas cosechadas**. Por ejemplo:
+
+**Dentro del contenedor:**
+
+```bash
+python usar_modelo.py 2026 280 240
+```
+
+Las hectáreas cosechadas no pueden ser mayores que las sembradas: el script rechaza ese caso. Si usas un año fuera de 2019–2025, el programa avisa de que el resultado es una extrapolación poco fiable.
+
+### 9.9 Terminar y apagar el contenedor
+
+1. Sal del contenedor. **Dentro del contenedor:**
+
+   ```bash
+   exit
+   ```
+
+2. De vuelta en **PowerShell**, en la carpeta raíz del proyecto:
+
+   ```powershell
+   docker compose down
+   ```
+
+<!-- VERIFICAR contra docker-compose.yml (volumes) y luego añadir aquí: "El proyecto está montado como volumen, por lo que los archivos generados (gráficos, datos limpios, modelos) permanecen en tu computador dentro de la carpeta del proyecto." -->
+
+Para volver a trabajar otro día: abre Docker Desktop y, en la carpeta raíz, ejecuta `docker compose up -d` y luego el comando del paso 9.6.
+
+### 9.10 Alternativa sin Docker (entorno virtual de Python)
+
+Necesitas tener Python instalado (el proyecto se desarrolló con Python 3.13; descárgalo en https://www.python.org/downloads/ y marca la casilla "Add python.exe to PATH" durante la instalación). Desde la **carpeta raíz** del proyecto:
+
+**Windows (PowerShell):**
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+
+python src\limpiar_datos.py
+python src\graficos_seaborn.py
+python src\perceptron_proyecto.py
+python src\modelo_proyecto.py
+python src\usar_modelo.py
+```
+
+Cuando el entorno está activo, el prompt de PowerShell empieza con `(.venv)`. Para salir de él, escribe `deactivate`. Si PowerShell bloquea la activación por una política de ejecución, ejecuta una vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, responde `S` y repite la activación.
+
+<!-- VERIFICAR: ejecutar esta alternativa en un Windows limpio antes de entregar. -->
+
+### 9.11 macOS y Linux
+
+El flujo con Docker es el mismo que en Windows; solo cambia la instalación y la terminal.
+
+- **macOS:** instala Git (viene con las herramientas de línea de comandos de Xcode; se ofrecen al escribir `git --version`) y [Docker Desktop](https://docs.docker.com/get-docker/). Abre la aplicación **Terminal**.
+- **Linux:** instala Git y [Docker Engine con el plugin Compose](https://docs.docker.com/engine/install/). Si Docker pide permisos, antepón `sudo` a los comandos `docker`.
+
+Luego sigue los pasos 9.2 a 9.9, usando `ls` en lugar de `Get-ChildItem`. Los comandos `git clone`, `cd`, `docker compose ...` y los scripts son idénticos.
+
+**Alternativa sin Docker (macOS/Linux):**
+
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate          # En Windows: .venv\Scripts\activate
+source .venv/bin/activate
 python -m pip install -r requirements.txt
- 
+
 python src/limpiar_datos.py
 python src/graficos_seaborn.py
 python src/perceptron_proyecto.py
 python src/modelo_proyecto.py
 python src/usar_modelo.py
 ```
- 
+
 Todos los scripts calculan sus rutas a partir de su propia ubicación, por lo que funcionan ejecutados desde cualquier carpeta.
- 
+
+<!-- VERIFICAR: ejecución real en macOS/Linux. -->
+
+### 9.12 Problemas frecuentes
+
+| Problema o mensaje | Causa probable | Solución |
+|---|---|---|
+| `git` o `docker` "no se reconoce como nombre de un cmdlet" | El programa no está instalado, o la terminal se abrió antes de instalarlo | Instálalo, cierra PowerShell, ábrela de nuevo y repite `git --version` / `docker --version`. Si persiste, reinicia el computador. |
+| `failed to connect to the docker API` o `Cannot connect to the Docker daemon` | Docker Desktop está cerrado o aún iniciando | Abre Docker Desktop, espera a que indique que está en ejecución y repite el comando. |
+| `no configuration file provided: not found` | Estás en la carpeta equivocada | Entra a la carpeta raíz del proyecto (9.3) y comprueba con `Get-ChildItem` que aparece `docker-compose.yml` (9.4). |
+| `cd : Cannot find path ...` | El nombre de la carpeta es otro | La carpeta se llama `Prediccion-Cafetera---Monica-Alejandra-Parra`. Usa `Get-ChildItem` para ver el nombre exacto. |
+| `no such service: prediccion-cafetera` | El nombre del servicio es distinto | Ejecuta `docker compose config --services` y usa el nombre que aparezca en el comando `exec`. |
+| `service ... is not running` | El contenedor no está iniciado | Ejecuta `docker compose up -d` y comprueba con `docker compose ps`. Si no arranca, mira el motivo con `docker compose logs`. |
+| Error al construir la imagen (`docker compose up -d --build` falla) | Sin internet, poco espacio en disco o Docker a medias | Comprueba tu conexión y el espacio libre, reinicia Docker Desktop y prueba `docker compose build --no-cache`. Si sigue fallando, copia el mensaje de error completo al pedir ayuda. |
+| `FileNotFoundError` o "No such file or directory" al ejecutar un script | Se saltó un paso previo o falta un archivo | Ejecuta los scripts en el orden de 9.7 y comprueba que existe `data/eva_base_agricola.csv` (≈ 33 MB). |
+| `ModuleNotFoundError` (sin Docker) | El entorno virtual no está activo o faltan librerías | Activa `.venv` (9.10) y ejecuta `python -m pip install -r requirements.txt`. |
+| `Activate.ps1 cannot be loaded because running scripts is disabled` | PowerShell bloquea scripts | Ejecuta `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` y repite la activación. |
 ---
  
 ## 10. Reproducibilidad y control de fuga de información
