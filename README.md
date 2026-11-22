@@ -395,7 +395,7 @@ docker compose ps
 
 El servicio `prediccion-cafetera` debe aparecer con estado `running` (en ejecución).
 
-<!-- VERIFICAR contra docker-compose.yml: nombre del servicio (prediccion-cafetera). -->
+
 
 ### 9.6 Entrar al contenedor
 
